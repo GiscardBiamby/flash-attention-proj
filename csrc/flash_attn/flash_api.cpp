@@ -7,12 +7,12 @@
 #include <torch/nn/functional.h>
 #include <ATen/cuda/CUDAContext.h>
 #include <c10/cuda/CUDAGuard.h>
+#include <iostream>
 
 #include <cutlass/numeric_types.h>
 
 #include "flash.h"
 #include "static_switch.h"
-
 #define CHECK_DEVICE(x) TORCH_CHECK(x.is_cuda(), #x " must be on CUDA")
 #define CHECK_SHAPE(x, ...) TORCH_CHECK(x.sizes() == torch::IntArrayRef({__VA_ARGS__}), #x " must have shape (" #__VA_ARGS__ ")")
 #define CHECK_CONTIGUOUS(x) TORCH_CHECK(x.is_contiguous(), #x " must be contiguous")
@@ -330,9 +330,10 @@ mha_fwd(at::Tensor &q,         // batch_size x seqlen_q x num_heads x head_size
 
     auto dprops = at::cuda::getCurrentDeviceProperties();
     // bool is_sm75 = dprops->major == 7 && dprops->minor == 5;
+    bool is_sm70 = dprops->major == 7 && dprops->minor == 0;
     bool is_sm8x = dprops->major == 8 && dprops->minor >= 0;
     bool is_sm90 = dprops->major == 9 && dprops->minor == 0;
-    TORCH_CHECK(is_sm90 || is_sm8x, "FlashAttention only supports Ampere GPUs or newer.");
+    TORCH_CHECK(is_sm70 || is_sm90 || is_sm8x, "FlashAttention only supports Volta, or Ampere GPUs or newer.");
     // We will support Turing in the near future
     // TORCH_CHECK(is_sm90 || is_sm8x || is_sm75, "FlashAttention only supports Turing GPUs or newer.");
 
@@ -365,7 +366,6 @@ mha_fwd(at::Tensor &q,         // batch_size x seqlen_q x num_heads x head_size
 
     if (window_size_left >= seqlen_k) { window_size_left = -1; }
     if (window_size_right >= seqlen_k) { window_size_right = -1; }
-
     // causal=true is the same as causal=false in this case
     if (seqlen_q == 1 && !alibi_slopes_.has_value()) { is_causal = false; }
     if (is_causal) { window_size_right = 0; }
@@ -519,9 +519,10 @@ mha_varlen_fwd(at::Tensor &q,  // total_q x num_heads x head_size, total_q := \s
 
     auto dprops = at::cuda::getCurrentDeviceProperties();
     // bool is_sm75 = dprops->major == 7 && dprops->minor == 5;
+    bool is_sm70 = dprops->major == 7 && dprops->minor == 0;
     bool is_sm8x = dprops->major == 8 && dprops->minor >= 0;
     bool is_sm90 = dprops->major == 9 && dprops->minor == 0;
-    TORCH_CHECK(is_sm90 || is_sm8x, "FlashAttention only supports Ampere GPUs or newer.");
+    TORCH_CHECK(is_sm70 || is_sm90 || is_sm8x, "FlashAttention only supports Ampere GPUs or newer.");
     // We will support Turing in the near future
     // TORCH_CHECK(is_sm90 || is_sm8x || is_sm75, "FlashAttention only supports Turing GPUs or newer.");
 
@@ -779,10 +780,11 @@ mha_bwd(const at::Tensor &dout,  // batch_size x seqlen_q x num_heads, x head_si
     if (is_causal) { window_size_right = 0; }
     auto dprops = at::cuda::getCurrentDeviceProperties();
     // bool is_sm75 = dprops->major == 7 && dprops->minor == 5;
+    bool is_sm70 = dprops->major == 7 && dprops->minor == 0;
     bool is_sm8x = dprops->major == 8 && dprops->minor >= 0;
     bool is_sm80 = dprops->major == 8 && dprops->minor == 0;
     bool is_sm90 = dprops->major == 9 && dprops->minor == 0;
-    TORCH_CHECK(is_sm90 || is_sm8x, "FlashAttention only supports Ampere GPUs or newer.");
+    TORCH_CHECK(is_sm70 || is_sm90 || is_sm8x, "FlashAttention only supports Ampere GPUs or newer.");
     // We will support Turing in the near future
     // TORCH_CHECK(is_sm90 || is_sm8x || is_sm75, "FlashAttention only supports Turing GPUs or newer.");
 
@@ -1012,10 +1014,11 @@ mha_varlen_bwd(const at::Tensor &dout,  // total_q x num_heads, x head_size
     if (is_causal) { window_size_right = 0; }
     auto dprops = at::cuda::getCurrentDeviceProperties();
     // bool is_sm75 = dprops->major == 7 && dprops->minor == 5;
+    bool is_sm70 = dprops->major == 7 && dprops->minor == 0;
     bool is_sm8x = dprops->major == 8 && dprops->minor >= 0;
     bool is_sm80 = dprops->major == 8 && dprops->minor == 0;
     bool is_sm90 = dprops->major == 9 && dprops->minor == 0;
-    TORCH_CHECK(is_sm90 || is_sm8x, "FlashAttention only supports Ampere GPUs or newer.");
+    TORCH_CHECK(is_sm70 || is_sm90 || is_sm8x, "FlashAttention only supports Ampere GPUs or newer.");
     // We will support Turing in the near future
     // TORCH_CHECK(is_sm90 || is_sm8x || is_sm75, "FlashAttention only supports Turing GPUs or newer.");
     bool is_dropout = p_dropout > 0.0;
@@ -1251,10 +1254,11 @@ mha_fwd_kvcache(at::Tensor &q,                 // batch_size x seqlen_q x num_he
                 ) {
 
     auto dprops = at::cuda::getCurrentDeviceProperties();
-    // bool is_sm75 = dprops->major == 7 && dprops->minor == 5;
+    // bool is_sm75 = dprops->major == 7 && dprops->minor == 5; 
+    bool is_sm70 = dprops->major == 7 && dprops->minor == 0;
     bool is_sm8x = dprops->major == 8 && dprops->minor >= 0;
     bool is_sm90 = dprops->major == 9 && dprops->minor == 0;
-    TORCH_CHECK(is_sm90 || is_sm8x, "FlashAttention only supports Ampere GPUs or newer.");
+    TORCH_CHECK(is_sm70 || is_sm90 || is_sm8x, "FlashAttention only supports Ampere GPUs or newer.");
     // We will support Turing in the near future
     // TORCH_CHECK(is_sm90 || is_sm8x || is_sm75, "FlashAttention only supports Turing GPUs or newer.");
 

@@ -1,0 +1,38 @@
+{
+	"folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "../flashcheck"
+        }
+    ],
+    "settings": {
+        "workbench.colorCustomizations": {
+            "activityBar.activeBackground": "#cef46a",
+            "activityBar.background": "#cef46a",
+            "activityBar.foreground": "#15202b",
+            "activityBar.inactiveForeground": "#15202b99",
+            "activityBarBadge.background": "#0f9bd0",
+            "activityBarBadge.foreground": "#e7e7e7",
+            "commandCenter.border": "#15202b99",
+            "editorGroup.border": "#cef46a",
+            "panel.border": "#cef46a",
+            "sash.hoverBorder": "#cef46a",
+            "sideBar.border": "#cef46a",
+            "statusBar.background": "#bff03b",
+            "statusBar.debuggingBackground": "#6c3bf0",
+            "statusBar.debuggingForeground": "#e7e7e7",
+            "statusBar.foreground": "#15202b",
+            "statusBarItem.hoverBackground": "#ade612",
+            "statusBarItem.remoteBackground": "#bff03b",
+            "statusBarItem.remoteForeground": "#15202b",
+            "tab.activeBorder": "#cef46a",
+            "titleBar.activeBackground": "#bff03b",
+            "titleBar.activeForeground": "#15202b",
+            "titleBar.inactiveBackground": "#bff03b99",
+            "titleBar.inactiveForeground": "#15202b99"
+        },
+        "peacock.remoteColor": "#bff03b"
+    }
+}

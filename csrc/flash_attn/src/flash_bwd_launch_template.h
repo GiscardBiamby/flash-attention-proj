@@ -12,7 +12,7 @@
 #include "flash_bwd_kernel.h"
 
 // Determine if the architecture supports FLASH and define a macro to handle parameter modifiers
-#if defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 800
+#if defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 700
 #define ARCH_SUPPORTS_FLASH
 #define KERNEL_PARAM_MODIFIER __grid_constant__
 #else
@@ -20,7 +20,7 @@
 #endif
 
 // Define a macro for unsupported architecture handling to centralize the error message
-#define FLASH_UNSUPPORTED_ARCH printf("FATAL: FlashAttention requires building with sm version sm80-sm90, but was built for < 8.0!");
+#define FLASH_UNSUPPORTED_ARCH printf("FATAL: FlashAttention requires building with sm version sm70-sm90, but was built for < 7.0!");
 
 // Use a macro to clean up kernel definitions
 #define DEFINE_FLASH_BACKWARD_KERNEL(kernelName, ...) \

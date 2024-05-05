@@ -1,0 +1,37 @@
+setuptools
+wheel
+ninja
+packaging
+pytest
+
+##
+# For linting / code formatting.
+black
+flake8
+isort
+isort
+ruff
+types-Pillow
+types-regex
+
+
+##
+# For notebooks / plotting
+ipython
+jupyterlab
+matplotlib
+nbconvert
+nbformat
+numpy
+pandas[performance,plot,output-formatting]
+pandas-read-xml
+pandoc
+polars
+scikit-learn
+scipy
+seaborn
+jupyterlab_code_formatter
+jupyterlab-lsp
+python-lsp-server[all]
+jlab-enhanced-cell-toolbar
+jupyterlab-snippets
