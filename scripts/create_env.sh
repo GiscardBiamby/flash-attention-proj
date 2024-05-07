@@ -6,8 +6,8 @@ set -e
 SCRIPTS_DIR="$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJ_ROOT="$(realpath "${SCRIPTS_DIR}"/../)"
 
-PYTHON_VERSION=3.10
-TORCH_VERSION=2.1.2
+PYTHON_VERSION=3.8
+TORCH_VERSION=2.1.0
 ENV_NAME="flash"
 # * use export for this one so FORCE_CUDA is set for any sub-processes launched by this script:
 export FORCE_CUDA=1
@@ -75,7 +75,7 @@ echo ""
 echo ""
 echo "=========================================================="
 echo "Creating conda env: ${ENV_NAME}"
-$CONDA_FN create --name "${ENV_NAME}" python=="${PYTHON_VERSION}" -y
+$CONDA_FN create --name "${ENV_NAME}" python=="${PYTHON_VERSION}" setuptools pip wheel ninja cython -y
 $CONDA_FN activate "${ENV_NAME}"
 $CONDA_FN install conda-libmamba-solver -y
 echo "Current environment: "
@@ -142,27 +142,6 @@ pip install -e . flash-attn --no-build-isolation
 
 popd
 
-# Some of the previous pip installs install their own torch/torchvision versions that might be
-# incompatible with each other. Also, some of them replace the GPU version of pytorch with a CPU
-# version. This final re-install of pytorch fixes it back:
-# echo ""
-# echo ""
-# echo "=========================================================="
-# echo "torch / torchvision fixup"
-
-# set +e
-# $CONDA_FN uninstall torch -y
-# $CONDA_FN uninstall pytorch -y
-# $CONDA_FN uninstall torchvision torchaudio -y
-# pip uninstall torch -y
-# pip uninstall pytorch -y
-# pip uninstall torchvision torchaudio -y
-# set -e
-
-# $CONDA_FN list
-# install_pytorch_cuda
-## TODO: If script still doesn't work, try also re-installing flash-attn here:
-# pip install -U flash-attn --no-build-isolation --no-cache-dir
 
 ## We are done, show the python environment:
 $CONDA_FN list

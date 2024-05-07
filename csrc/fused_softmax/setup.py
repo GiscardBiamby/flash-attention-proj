@@ -8,6 +8,12 @@ from setuptools import setup
 from torch.utils.cpp_extension import BuildExtension, CUDAExtension, CUDA_HOME
 
 
+ENABLE_70 = True
+ENABLE_75 = True
+ENABLE_80 = False
+ENABLE_90 = False
+
+
 def get_cuda_bare_metal_version(cuda_dir):
     raw_output = subprocess.check_output([cuda_dir + "/bin/nvcc", "-V"], universal_newlines=True)
     output = raw_output.split()
@@ -28,10 +34,15 @@ def append_nvcc_threads(nvcc_extra_args):
 
 
 cc_flag = []
-cc_flag.append("-gencode")
-cc_flag.append("arch=compute_70,code=sm_70")
-cc_flag.append("-gencode")
-cc_flag.append("arch=compute_80,code=sm_80")
+if ENABLE_70:
+    cc_flag.append("-gencode")
+    cc_flag.append("arch=compute_70,code=sm_70")
+if ENABLE_75:
+    cc_flag.append("-gencode")
+    cc_flag.append("arch=compute_75,code=sm_75")
+if ENABLE_80:
+    cc_flag.append("-gencode")
+    cc_flag.append("arch=compute_80,code=sm_80")
 
 setup(
     name='fused_softmax_lib',

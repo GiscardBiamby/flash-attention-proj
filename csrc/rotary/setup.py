@@ -13,6 +13,12 @@ import subprocess
 this_dir = os.path.dirname(os.path.abspath(__file__))
 
 
+ENABLE_70 = True
+ENABLE_75 = True
+ENABLE_80 = False
+ENABLE_90 = False
+
+
 def get_cuda_bare_metal_version(cuda_dir):
     raw_output = subprocess.check_output([cuda_dir + "/bin/nvcc", "-V"], universal_newlines=True)
     output = raw_output.split()
@@ -96,13 +102,19 @@ cc_flag = []
 _, bare_metal_version = get_cuda_bare_metal_version(CUDA_HOME)
 if bare_metal_version < Version("11.0"):
     raise RuntimeError("rotary_emb is only supported on CUDA 11 and above")
-cc_flag.append("-gencode")
-cc_flag.append("arch=compute_70,code=sm_70")
-cc_flag.append("-gencode")
-cc_flag.append("arch=compute_80,code=sm_80")
-if bare_metal_version >= Version("11.8"):
+if ENABLE_70:
     cc_flag.append("-gencode")
-    cc_flag.append("arch=compute_90,code=sm_90")
+    cc_flag.append("arch=compute_70,code=sm_70")
+if ENABLE_75:
+    cc_flag.append("-gencode")
+    cc_flag.append("arch=compute_70,code=sm_70")
+if ENABLE_80:
+    cc_flag.append("-gencode")
+    cc_flag.append("arch=compute_80,code=sm_80")
+if ENABLE_90:
+    if bare_metal_version >= Version("11.8"):
+        cc_flag.append("-gencode")
+        cc_flag.append("arch=compute_90,code=sm_90")
 
 ext_modules.append(
     CUDAExtension(

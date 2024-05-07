@@ -16,6 +16,8 @@ def _get_block_size_n(device, head_dim, is_dropout, is_causal):
     # This should match the block sizes in the CUDA kernel
     assert head_dim <= 256
     major, minor = torch.cuda.get_device_capability(device)
+    is_sm70 = major == 7 and minor == 0
+    is_sm75 = major == 7 and minor == 5
     is_sm8x = major == 8 and minor > 0  # Only include sm86 and sm89, exclude sm80 (A100)
     is_sm80 = major == 8 and minor == 0
     is_sm90 = major == 9 and minor == 0

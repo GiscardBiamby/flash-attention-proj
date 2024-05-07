@@ -42,7 +42,8 @@ fi
 
 export NVCC_THREADS=16
 export CUDA_LAUNCH_BLOCKING=1
-export CUDA_VISIBLE_DEVICES=4,5,6,7
+export CUDA_VISIBLE_DEVICES="7,8"
+export TORCH_USE_CUDA_DSA=1
 
 pushd "${PROJ_ROOT}"
 mamba activate flash
@@ -51,10 +52,10 @@ mamba activate flash
 echo ""
 echo "=============================================================================="
 echo "Clearing build artifacts..."
-pip uninstall -y flash-attn
-rm -rf "${BUILD_DIR}"
-rm -rf "${PROJ_ROOT}/flash_attn.egg-info"
-rm -rf "${PROJ_ROOT}/flash_attn_2_cuda.cpython-*.so"
+# pip uninstall -y flash-attn
+# rm -rf "${BUILD_DIR}"
+# rm -rf "${PROJ_ROOT}/flash_attn.egg-info"
+# rm -rf "${PROJ_ROOT}/flash_attn_2_cuda.cpython-*.so"
 
 # * Build
 echo ""
@@ -66,4 +67,4 @@ pip install -e .
 echo ""
 echo "=============================================================================="
 echo "Testing flash_attn"
-pytest --maxfail=1 -s tests/test_flash_attn.py
+pytest --maxfail=5 -s tests/test_flash_attn.py
